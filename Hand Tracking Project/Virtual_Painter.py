@@ -273,15 +273,14 @@ def run(camera_index: int) -> None:
                     for id in range(1, 5):
                         fingers.append(1 if points[tip_ids[id]][1] < points[tip_ids[id]-2][1] else 0)
 
-                    # Selección de color
+                    # Selección de color/herramienta
+                    # Nota: la última zona actúa como borrador (borra por partes) en vez de limpiar todo.
                     if (fingers[1] and fingers[2]) and all(fingers[i]==0 for i in [0,3,4]):
-                        xp, yp = x1, y1
+                        xp, yp = 0, 0
                         if y1 < 125:
                             zone = min(x1 // (real_w // 4), 3, len(overlay_list) - 1)
                             header = overlay_list[zone]
                             draw_color = palette[zone]
-                            if zone == 3:
-                                clear_canvas()
                         cv2.rectangle(image, (x1-10,y1-15), (x2+10,y2+23), draw_color, cv2.FILLED)
 
                     # Stand By
