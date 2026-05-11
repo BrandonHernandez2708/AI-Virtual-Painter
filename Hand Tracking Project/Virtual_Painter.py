@@ -214,6 +214,11 @@ def run(camera_index: int) -> None:
     xp, yp     = 0, 0
     img_canvas = np.zeros((real_h, real_w, 3), np.uint8)
 
+    def clear_canvas() -> None:
+        nonlocal img_canvas, xp, yp
+        img_canvas = np.zeros((real_h, real_w, 3), np.uint8)
+        xp, yp = 0, 0
+
     hand_options = hand_landmarker.HandLandmarkerOptions(
         base_options=base_options.BaseOptions(model_asset_path=MODEL_PATH),
         running_mode=vision_task_running_mode.VisionTaskRunningMode.VIDEO,
@@ -272,9 +277,11 @@ def run(camera_index: int) -> None:
                     if (fingers[1] and fingers[2]) and all(fingers[i]==0 for i in [0,3,4]):
                         xp, yp = x1, y1
                         if y1 < 125:
-                            zone = min(x1 // (real_w // 4), len(overlay_list) - 1)
-                            header     = overlay_list[zone]
+                            zone = min(x1 // (real_w // 4), 3, len(overlay_list) - 1)
+                            header = overlay_list[zone]
                             draw_color = palette[zone]
+                            if zone == 3:
+                                clear_canvas()
                         cv2.rectangle(image, (x1-10,y1-15), (x2+10,y2+23), draw_color, cv2.FILLED)
 
                     # Stand By
@@ -291,9 +298,9 @@ def run(camera_index: int) -> None:
                         xp, yp = x1, y1
 
                     # Limpiar
-                    if all(fingers[i]==0 for i in range(5)):
-                        img_canvas = np.zeros((real_h, real_w, 3), np.uint8)
-                        xp, yp     = x1, y1
+                    #if all(y1 = 126):
+                     #   img_canvas = np.zeros((real_h, real_w, 3), np.uint8)
+                      #  xp, yp     = x1, y1
 
                     # Grosor
                     if (all(fingers[i]==j for i,j in zip(range(5),[1,1,0,0,0])) or
@@ -326,8 +333,11 @@ def run(camera_index: int) -> None:
                 img = cv2.resize(img, (DISPLAY_W, DISPLAY_H))
 
             cv2.imshow(WIN, img)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            key = cv2.waitKey(1) & 0xFF
+            if key == ord('q'):
                 break
+            if key in (ord('c'), ord('C')):
+                clear_canvas()
 
     cap.release()
     cv2.destroyAllWindows()
