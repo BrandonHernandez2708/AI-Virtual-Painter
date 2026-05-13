@@ -297,9 +297,9 @@ def run(camera_index: int) -> None:
                         xp, yp = x1, y1
 
                     # Limpiar
-                    #if all(y1 = 126):
-                     #   img_canvas = np.zeros((real_h, real_w, 3), np.uint8)
-                      #  xp, yp     = x1, y1
+                    if all(fingers[i]==0 for i in range(5)):
+                        img_canvas = np.zeros((real_h, real_w, 3), np.uint8)
+                        xp, yp     = x1, y1
 
                     # Grosor
                     if (all(fingers[i]==j for i,j in zip(range(5),[1,1,0,0,0])) or
